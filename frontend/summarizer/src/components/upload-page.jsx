@@ -10,7 +10,7 @@ function UploadPage() {
   const [textList, setTextList] = useState([]);
   //const [finalText, setFinalText] = useState("null");
   const { state } = useLocation();
-  const { distance } = state;
+  const { distance,numArticles } = state;
   const navigate = useNavigate();
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -35,6 +35,7 @@ function UploadPage() {
       body: JSON.stringify({
         text_list: textList,
         distance: distance,
+        num_articles: numArticles,
       }),
     };
     fetch(`${url}/engine/get-summary/`, requestOptions)

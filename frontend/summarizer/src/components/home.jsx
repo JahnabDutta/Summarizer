@@ -4,11 +4,11 @@ import { Link ,useNavigate} from "react-router-dom";
 import Logo from "../Resources/Images/logo.png";
 function Home() {
   const navigate = useNavigate();
+  const [numArticles, setNumArticles] = useState(1);
   const [distance,setDistance] = useState(0);
   const handleButtonClick = () => {
-    navigate("/upload", { state: { distance: distance } });
+    navigate("/upload", { state: { distance: distance,numArticles:numArticles } });
   }
-  console.log(distance);
   return (
     <Container component="main" maxWidth="md">
       <Paper elevation={2}>
@@ -49,10 +49,16 @@ function Home() {
           >
             <Grid item>
               <TextField label="Number of Articles" variant="outlined" type="number"
+              value ={numArticles} onChange = {(e)=>{setNumArticles(e.target.value)}}/>
+                
+            </Grid>
+            <Grid item>
+              <TextField label="Closeness of articles" variant="outlined" type="number"
               value ={distance} onChange = {(e)=>{setDistance(e.target.value)}}/>
                 
             </Grid>
             <Grid item>
+              
           <Button onClick = {handleButtonClick}>
             Upload Articles
 
