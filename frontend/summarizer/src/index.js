@@ -5,7 +5,16 @@ import App from './App';
 
 ReactDOM.render(
   <React.StrictMode>
+     <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+    }}
+  >
     <App />
+    </div>
   </React.StrictMode>,
   document.getElementById('root')
 );
