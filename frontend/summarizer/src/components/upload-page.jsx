@@ -1,16 +1,35 @@
 import React, { Component, useState, useEffect } from "react";
-import { Container, Button, Typography, Grid, Paper, Box } from "@mui/material";
+import {
+  Container,
+  Button,
+  Typography,
+  Grid,
+  Paper,
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  CircularProgress,
+  Snackbar
+} from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../Resources/Images/logo.png";
 import { ClassNames } from "@emotion/react";
+
+import MuiAlert from "@mui/lab/Alert";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 function UploadPage() {
   const [file, setFile] = useState(null);
   const url = "http://localhost:8000";
   const [fileList, setFileList] = useState([]);
   const [textList, setTextList] = useState([]);
-  //const [finalText, setFinalText] = useState("null");
+  const [progressbarState,setProgressbarState] = useState(false);
+  const [articleOpen,setArticleOpen] = useState(false);
   const { state } = useLocation();
-  const { distance,numArticles } = state;
+  const { distance, numArticles } = state;
   const navigate = useNavigate();
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -28,7 +47,20 @@ function UploadPage() {
     reader.readAsText(e.target.files[0]);
   };
 
+  const closeArticleOpen=(event, reason)=>{
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setArticleOpen(false);
+
+  }
+
   const handleSubmit = () => {
+    if (fileList.length != numArticles) {
+      setArticleOpen(true);
+      return;
+    }
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -38,17 +70,16 @@ function UploadPage() {
         num_articles: numArticles,
       }),
     };
+    setProgressbarState(true);
     fetch(`${url}/engine/get-summary/`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
         const finalText = data.file;
+        setProgressbarState(false);
         return finalText;
       })
       .then((finalText) => {
         navigate("/download", { state: { finalText: finalText } });
-      })
-      .catch((error) => {
-        console.log(error);
       });
 
     // .then(() => {console.log(finalText);
@@ -88,8 +119,28 @@ function UploadPage() {
     );
   };
 
+  const ProgressBar=()=>{
+    return(
+      <Dialog
+      open={progressbarState}
+      aria-labelledby="simple-dialog-title"
+   
+
+      
+      >
+         <DialogTitle id="simple-dialog-title">Generating the Summary</DialogTitle>
+        <DialogContent   style={{paddingLeft:"40%"}}>
+        <CircularProgress /> 
+     
+        </DialogContent>
+      </Dialog>
+    )
+  }
+  
+
   return (
     <Container component="main" maxWidth="md">
+      <ProgressBar/>
       <Paper elevation={2}>
         <Box
           sx={{
@@ -106,7 +157,7 @@ function UploadPage() {
             alignItems="flex-end"
           >
             <Grid item>
-              <Typography variant="h4">Upload Articles</Typography>
+              <Typography variant="h4">Fetch Articles</Typography>
             </Grid>
             <Grid item>
               <img src={Logo} alt="logo" style={{ maxHeight: "100px" }}></img>
@@ -178,6 +229,15 @@ function UploadPage() {
           </Grid>
         </Box>
       </Paper>
+      <Snackbar
+        open={articleOpen}
+        autoHideDuration={5000}
+        onClose={closeArticleOpen}
+      >
+        <Alert onClose={closeArticleOpen} severity="error">
+          Select {numArticles} articles
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

@@ -20,6 +20,20 @@ function DownloadPage() {
     return <Typography>{finalText}</Typography>;
   };
 
+  function download() {
+    const filename = "summary.txt";
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(finalText));
+    element.setAttribute('download', filename);
+  
+    element.style.display = 'none';
+    document.body.appendChild(element);
+  
+    element.click();
+  
+    document.body.removeChild(element);
+  }
+
   return (
     <Container component="main" maxWidth="md">
       <Paper elevation={2}>
@@ -56,7 +70,7 @@ function DownloadPage() {
             spacing={2}
           >
             <Grid item>
-              <Button> Download</Button>
+              <Button onClick={()=>{download()}}> Download</Button>
             </Grid>
             <Grid item>
               <Button component={Link} to="/">
